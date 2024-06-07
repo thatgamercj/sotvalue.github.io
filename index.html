@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chest Gold Values</title>
+    <style>
+        body {
+            background: black;
+            background-size: cover;
+            color: #31ffb3;
+            font-family: 'Pirata One', cursive;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px #000;
+            text-align: left;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+        li {
+            font-size: 1.5em;
+            margin: 10px 0;
+            text-shadow: 1px 1px #000;
+        }
+        .menu {
+            background: rgba(49, 255, 179, 0.7);
+            padding: 20px;
+            width: 250px;
+            color: #000000;
+            text-align: left;
+            overflow-y: hidden; /* Initially hidden */
+            max-height: 0;
+            transition: max-height 0.3s ease-out, overflow-y 0.3s ease-out; /* Add overflow-y to transition */
+            position: relative;
+        }
+        .menu.open {
+            max-height: 570px; /* Adjust according to content height */
+            overflow-y: auto; /* Display scrollbar when expanded */
+        }
+        .menu h2 {
+            font-size: 2em;
+        }
+        .menu label {
+            display: block;
+            margin: 10px 0;
+        }
+        .menu input[type="radio"],
+        .menu input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .arrow {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease-out;
+        }
+        .menu.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .menu.open .menu-label {
+            opacity: 1;
+        }
+        .menu.open::-webkit-scrollbar {
+            width: 10px;
+        }
+        .menu.open::-webkit-scrollbar-track {
+            background: #000000; 
+        }
+        .menu.open::-webkit-scrollbar-thumb {
+            background: #31ffb3; 
+            border-radius: 5px; /* Rounded corners for the thumb */
+        }
+        /* New CSS for cell layout */
+        .cell {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #31ffb3;
+            margin-right: 20px;
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .text-container {
+            font-size: 1.2em;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div>
+        <h1>Chest Gold Values</h1>
+        <div id="chestList" class="chest-table"></div>
+    </div>
+    <div class="menu" id="menu">
+        <div class="menu-label">Menu</div>
+        <div class="arrow">&#9660;</div>
+        <h2>Sort & Filter</h2>
+        <div>
+            <label>
+                <input type="radio" name="sort" value="ascending" checked> Ascending
+            </label>
+            <label>
+                <input type="radio" name="sort" value="descending"> Descending
+            </label>
+        </div>
+        <br>
+        <div>
+            <label>
+                <input type="checkbox" name="filter" value="Basic" checked> Basic
+            </label>
+            <label>
+                <input type="checkbox" name="filter" value="Coral" checked> Coral
+            </label>
+            <label>
+                <input type="checkbox" name="filter" value="Ashen" checked> Ashen
+            </label>
+            <label>
+                <input type="checkbox" name="filter" value="Skeleton" checked> Skeleton
+            </label>
+            <label>
+                <input type="checkbox" name="filter" value="Ghost" checked> Ghost (Damned)
+            </label>
+            <label>
+                <input type="checkbox" name="filter" value="Athenas" checked> Athenas
+            </label>
+        </div>
+        <h2>Emissary Bonus</h2>
+        <div>
+            <label>
+                <input type="radio" name="emissary" value="1" checked> 1
+            </label>
+            <label>
+                <input type="radio" name="emissary" value="1.33"> 2
+            </label>
+            <label>
+                <input type="radio" name="emissary" value="1.67"> 3
+            </label>
+            <label>
+                <input type="radio" name="emissary" value="2"> 4
+            </label>
+            <label>
+                <input type="radio" name="emissary" value="2.5"> 5
+            </label>
+        </div>
+    </div>
+
+    <script defer>
+        const chestList = document.getElementById('chestList');
+        const sortRadios = document.querySelectorAll('input[name="sort"]');
+        const filterCheckboxes = document.querySelectorAll('input[name="filter"]');
+        const emissaryRadios = document.querySelectorAll('input[name="emissary"]');
+        const menu = document.getElementById('menu');
+        const arrow = document.querySelector('.arrow');
+
+        const chestsData = [
+            { type: 'Basic', name: 'Castaway\'s Chest',currency: 'Gold', min: 60, max: 130, image: 'https://static.wikia.nocookie.net/seaofthieves5135/images/8/80/Castaway.png/revision/latest?cb=20180414193309' },
+            { type: 'Coral', name: 'Coral Castaway\'s Chest',currency: 'Gold', min: 105, max: 228 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/8/82/Coral_Castaway%27s_Chest.png/revision/latest?cb=20211103175113'},
+            { type: 'Basic', name: 'Seafarer\'s Chest',currency: 'Gold', min: 140, max: 260, image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/d/d5/Seafarer%27s_Chest.png/revision/latest?cb=20181021033930' },
+            { type: 'Ashen', name: 'Ashen Castaway\'s Chest',currency: 'Gold', min: 140, max: 260 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/9/9e/Ashen_Castaway%27s_Chest.png/revision/latest?cb=20180929184812'},
+            { type: 'Basic', name: 'Marauder\'s Chest',currency: 'Gold', min: 280, max: 520, image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/9/9a/Marauder%27s_Chest.png/revision/latest?cb=20181021034132' },
+            { type: 'Ashen', name: 'Ashen Seafarer\'s Chest',currency: 'Gold', min: 280, max: 520 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/c/c0/Ashen_Seafarer%27s_Chest.png/revision/latest?cb=20220416011853'},
+            { type: 'Coral', name: 'Coral Seafarer\'s Chest',currency: 'Gold', min: 245, max: 455 , image: 'https://seaofthieves.wiki.gg/images/thumb/8/8b/Coral_Seafarer%27s_Chest.png/640px-Coral_Seafarer%27s_Chest.png'},
+            { type: 'Coral', name: 'Coral Marauder\'s Chest',currency: 'Gold', min: 490, max: 910 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/7/74/Coral_Marauder%27s_Chest.png/revision/latest?cb=20211103175109'},
+            { type: 'Ashen', name: 'Ashen Marauder\'s Chest',currency: 'Gold', min: 560, max: 1100 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/4/4a/Ashen_Marauder%27s_Chest.png/revision/latest?cb=20220416011733'},
+            { type: 'Basic', name: 'Captain\'s Chest',currency: 'Gold', min: 560, max: 1100 , image: 'https://seaofthieves.wiki.gg/images/5/51/Captain%27s_Chest.png'},
+            { type: 'Coral', name: 'Coral Captain\'s Chest',currency: 'Gold', min: 980, max: 1925 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/0/0d/Coral_Captain%27s_Chest.png/revision/latest?cb=20211103175115'},
+            { type: 'Ghost', name: 'Chest of the Damned',currency: 'Gold', min: 1000, max: 1160 , image: 'https://seaofthieves.wiki.gg/images/3/34/Chest_of_the_Damned.jpg'},
+            { type: 'Basic', name: 'Sailor\'s Chest',currency: 'Gold', min: 1000, max: 1050 , image: 'https://seaofthieves.wiki.gg/images/thumb/7/79/Sailor%27s_Chest.png/640px-Sailor%27s_Chest.png'},
+            { type: 'Skeleton', name: 'Skeleton Captain\'s Chest',currency: 'Gold', min: 1150, max: 1550 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/f/f5/Skeleton_Captain%27s_Chest.png/revision/latest?cb=20200330144712'},
+            { type: 'Skeleton', name: 'Stronghold Chest',currency: 'Gold', min: 1500, max: 3000 , image: 'https://static.wikia.nocookie.net/seaofthieves5135/images/b/bc/Stronghold_Chest.png/revision/latest?cb=20180414202437'},
+            { type: 'Basic', name: 'Sea Master\'s Chest',currency: 'Gold', min: 1500, max: 1550 , image: 'https://seaofthieves.wiki.gg/images/f/f7/Sea_Master%27s_Chest.png'},
+            { type: 'Basic', name: 'Admiral\'s Chest',currency: 'Gold', min: 1525, max: 1575 , image: 'https://seaofthieves.wiki.gg/images/7/70/Admiral%27s_Chest.png'},
+            { type: 'Ashen', name: 'Ashen Sea Master\'s Chest',currency: 'Gold', min: 1700, max: 1798 , image: 'https://seaofthieves.wiki.gg/images/9/93/Ashen_Sea_Master%27s_Chest.png'},
+            { type: 'Ashen', name: 'Ashen Admiral\'s Chest',currency: 'Gold', min: 1825, max: 1875 , image: 'https://seaofthieves.wiki.gg/images/2/2e/Ashen_Admiral%27s_Chest.png'},
+            { type: 'Basic', name: 'Chest of a Thousand Grogs',currency: 'Gold', min: 2200, max: 2600 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/b/bb/Chest_of_a_Thousand_Grogs.png/revision/latest?cb=20181021034618'},
+            { type: 'Basic', name: 'Baron\'s Chest',currency: 'Gold', min: 2000, max: 2050 , image: 'https://seaofthieves.wiki.gg/images/c/c1/Baron%27s_Chest.png'},
+            { type: 'Ashen', name: 'Ashen Baron\'s Chest',currency: 'Gold', min: 2250, max: 2300 , image: 'https://seaofthieves.wiki.gg/images/3/3c/Ashen_Baron%27s_Chest.png'},
+            { type: 'Basic', name: 'Chest of Sorrow',currency: 'Gold', min: 3000, max: 3500 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/d/d0/Chest_of_Sorrow.png/revision/latest?cb=20210306072522'},
+            { type: 'Basic', name: 'Chest of Rage',currency: 'Gold', min: 3000, max: 3500 , image: 'https://seaofthieves.wiki.gg/images/6/65/Chest_of_Rage.png'},
+            { type: 'Basic', name: 'King\'s Chest',currency: 'Gold', min: 3000, max: 3100 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/5/5c/King%27s_Chest.png/revision/latest?cb=20240506201902'},
+            { type: 'Ashen', name: 'Ashen King\'s Chest',currency: 'Gold', min: 3700, max: 3800 , image: 'https://seaofthieves.wiki.gg/images/d/da/Ashen_King%27s_Chest.png'},
+            { type: 'Basic', name: 'Chest of Ancient Tributes',currency: 'Gold', min: 3400, max: 3900 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/7/7a/Chest_of_Ancient_Tributes.png/revision/latest?cb=20211020181204'},
+            { type: 'Basic', name: 'Chest of Everlasting Sorrow',currency: 'Gold', min: 6000, max: 6800 , image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/2/25/Chest_of_Everlasting_Sorrow.png/revision/latest?cb=20210815203058'},
+            { type: 'Basic', name: 'Chest of Boundless Sorrow',currency: 'Gold', min: 6000, max: 6800 , image: 'https://seaofthieves.wiki.gg/images/5/59/Chest_of_Boundless_Sorrow.jpg'},
+            { type: 'Basic', name: 'Chest of Fortune',currency: 'Gold', min: 20000, max: 20000, image: 'https://cdn.gfinityesports.com/images/ncavvykf/gfinityesports/d9fb40b3a8b4249ad81e15f341827e934f608fda-1920x1080.jpg?rect=0,36,1920,1008&w=1200&h=630&auto=format'},
+            { type: 'Athenas', name: 'Chests of Legends',currency: 'Gold', min: 8600, max: 11000 , image: 'https://seaofthieves.wiki.gg/images/2/21/Chest_of_Legends.png'},
+            { type: ['Ashen', 'Athenas'], name: 'Ashen Chests of Legends',currency: 'Gold', min: 13000, max: 15000, image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/5/5a/Ashen_Chest_of_Legends.png/revision/latest/scale-to-width-down/1200?cb=20181021043935' },
+            { type: 'Coral', name: 'Chest of Siren Song',currency: 'Gold', min: 250, max: 520, image: 'https://fbi.cults3d.com/uploaders/17233576/illustration-file/4799a925-414e-4a71-ae0b-4b46deb02de2/Ach_Master_of_Siren_Song.png'},
+            { type: 'Ashen', name: 'Ashen Chest', currency: 'Doubloons', min: 5, max: 5, image: 'https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/f/ff/Ashen_Chest.png/revision/latest/scale-to-width-down/250?cb=20191120221109' },
+        ];
+    
+        function renderChests() {
+    const sortOrder = document.querySelector('input[name="sort"]:checked').value;
+    const emissaryBonus = parseFloat(document.querySelector('input[name="emissary"]:checked').value);
+    const filters = Array.from(document.querySelectorAll('input[name="filter"]:checked')).map(cb => cb.value);
+
+    let chests = chestsData.filter(chest => {
+        if (filters.includes(chest.type)) {
+            return true;
+        } else if ((filters.includes('Athenas') || filters.includes('Ashen')) && chest.name === 'Ashen Chests of Legends') {
+            return true;
+        }
+        return false;
+    });
+
+    chests.sort((a, b) => {
+        // First, sort by currency type
+        if (a.currency !== b.currency) {
+            return sortOrder === 'ascending' ? (a.currency === 'Gold' ? -1 : 1) : (a.currency === 'Gold' ? 1 : -1);
+        }
+        // Then, sort by gold or doubloon value
+        const aAmount = (a.min * emissaryBonus);
+        const bAmount = (b.min * emissaryBonus);
+        return sortOrder === 'ascending' ? aAmount - bAmount : bAmount - aAmount;
+    });
+
+    chestList.innerHTML = '';
+    chests.forEach(chest => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+
+        // Create image container
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        const image = document.createElement('img');
+        image.src = chest.image;
+        image.alt = chest.name;
+        image.width = 10;
+        image.height = 10;
+        imageContainer.appendChild(image);
+
+        // Create text container
+        const textContainer = document.createElement('div');
+        textContainer.classList.add('text-container');
+        const currency = chest.currency === 'Gold' ? 'Gold' : 'Doubloons';
+        const minAmount = (chest.min * emissaryBonus).toFixed(0);
+        const maxAmount = (chest.max * emissaryBonus).toFixed(0);
+        const text = document.createTextNode(`${chest.name}: ${minAmount} - ${maxAmount} ${currency}`);
+        textContainer.appendChild(text);
+
+        // Append image container and text container to cell
+        cell.appendChild(imageContainer);
+        cell.appendChild(textContainer);
+
+        // Append cell to chestList
+        chestList.appendChild(cell);
+    });
+}
+
+        sortRadios.forEach(radio => radio.addEventListener('change', renderChests));
+        filterCheckboxes.forEach(checkbox => checkbox.addEventListener('change', renderChests));
+        emissaryRadios.forEach(radio => radio.addEventListener('change', renderChests));
+
+        // Initial render with default sorting and filtering
+        renderChests();
+
+        // Toggle menu visibility
+        arrow.addEventListener('click', function() {
+            menu.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>
